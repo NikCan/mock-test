@@ -4,7 +4,7 @@ import { App } from './app/App';
 import './global.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <BrowserRouter>
+  <BrowserRouter basename="mock-test">
     <App />
   </BrowserRouter>
 );

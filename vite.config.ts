@@ -6,6 +6,7 @@ import path from 'path';
 export default defineConfig(() => {
   return {
     plugins: [react()],
+    base: 'https://nikcan.github.io/mock-test',
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src/')
