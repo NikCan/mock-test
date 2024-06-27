@@ -1,23 +1,31 @@
 import { useAppStore } from '@/app/model';
-import { extractNumberFromPath } from '@/shared/lib';
-import { mockTests } from '@/shared/mockData';
+import { Storage } from '@/shared/config';
+import { calculateTimeLeft, extractNumberFromPath } from '@/shared/lib';
+import { mockTests } from '@/shared/mock-data';
 import { TestForm, TestStepper, Timer } from '@/widgets';
-import { Stack, Typography } from '@mui/material';
-import { FC, memo } from 'react';
+import { Paper, Stack, Typography } from '@mui/material';
+import { FC, memo, useCallback, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 export const TestPage: FC = memo(() => {
   const location = useLocation();
   const path = extractNumberFromPath(location.pathname);
   const test = mockTests.find((el) => el.id === path);
-  const currentQuestionIndex = test?.id
-    ? useAppStore((state) => state.currentQuestionIndices[test?.id] ?? 0)
-    : 0;
-  console.log(currentQuestionIndex);
+  const currentQuestionIndex = useAppStore(
+    (state) => state.currentQuestionIndices[test?.id ?? 0] ?? 0
+  );
+  const startTimeKey = `${Storage.START_TIME}_${test?.id}`;
+  const startTime = localStorage.getItem(startTimeKey);
+  const [timeIsOver, setTimeIsOver] = useState(() => {
+    return startTime && test?.timeLimit
+      ? calculateTimeLeft(startTime, test.timeLimit) <= 0
+      : false;
+  });
 
-  const onTimeUp = () => {
-    console.log('time up');
-  };
+  const onTimeUp = useCallback(() => {
+    setTimeIsOver(true);
+  }, []);
+
   if (!test) {
     return (
       <Stack sx={{ alignItems: 'center' }}>
@@ -27,27 +35,30 @@ export const TestPage: FC = memo(() => {
   }
 
   return (
-    <Stack sx={{ gap: 1 }}>
-      <Typography variant="h5">Testing</Typography>
-      <TestStepper
-        total={test.questions.length}
-        current={currentQuestionIndex}
-      />
-      <Stack sx={{ flexDirection: 'row', gap: 1 }}>
-        <Typography variant="h6">{test.title}</Typography>
-        {test.timeLimit && (
-          <Timer
-            onTimeUp={onTimeUp}
-            duration={test.timeLimit}
-            uniqueKey={test.id.toString()}
-          />
-        )}
+    <Paper sx={{ p: 2, maxWidth: 1200 }}>
+      <Stack sx={{ gap: 2 }}>
+        <Typography variant="h5">Testing</Typography>
+        <TestStepper
+          current={currentQuestionIndex}
+          total={test.questions.length}
+        />
+        <Stack sx={{ flexDirection: 'row', gap: 1, alignItems: 'flex-start' }}>
+          <Typography variant="h6">{test.title}</Typography>
+          {test.timeLimit && (
+            <Timer
+              duration={test.timeLimit}
+              uniqueKey={startTimeKey}
+              onTimeUp={onTimeUp}
+            />
+          )}
+        </Stack>
+        <TestForm
+          currentQuestionIndex={currentQuestionIndex}
+          test={test}
+          timeIsOver={timeIsOver}
+        />
       </Stack>
-      <Typography fontWeight="bold">
-        {test.questions[currentQuestionIndex]?.question}
-      </Typography>
-      <TestForm test={test} currentQuestionIndex={currentQuestionIndex} />{' '}
-    </Stack>
+    </Paper>
   );
 });
 

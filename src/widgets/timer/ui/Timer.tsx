@@ -1,5 +1,6 @@
-import { Box, Stack, Typography } from '@mui/material';
-import { FC, memo, useEffect, useState } from 'react';
+import { calculateTimeLeft } from '@/shared/lib';
+import { Box, Typography } from '@mui/material';
+import { FC, memo, useCallback, useEffect, useState } from 'react';
 
 interface Props {
   /** in seconds */
@@ -8,39 +9,48 @@ interface Props {
   uniqueKey: string;
 }
 export const Timer: FC<Props> = memo(({ duration, onTimeUp, uniqueKey }) => {
-  const [timeLeft, setTimeLeft] = useState<number>(duration);
-
-  const formattedTime = `${String(Math.floor(timeLeft / 60)).padStart(
-    2,
-    '0'
-  )}:${String(timeLeft % 60).padStart(2, '0')}`;
-
-  useEffect(() => {
-    const startTimeKey = `startTime_${uniqueKey}`;
-    let startTime = localStorage.getItem(startTimeKey);
+  const getStartTime = useCallback((): string => {
+    let startTime = localStorage.getItem(uniqueKey);
     if (!startTime) {
       startTime = Date.now().toString();
-      localStorage.setItem(startTimeKey, startTime);
+      localStorage.setItem(uniqueKey, startTime);
+    }
+    return startTime;
+  }, [uniqueKey]);
+
+  const startTime = getStartTime();
+
+  const [timeLeft, setTimeLeft] = useState<number>(() =>
+    calculateTimeLeft(startTime, duration)
+  );
+
+  useEffect(() => {
+    const newTimeLeft = calculateTimeLeft(startTime, duration);
+    if (newTimeLeft <= 0) {
+      onTimeUp();
+      setTimeLeft(0);
+      return;
     }
 
     const interval = setInterval(() => {
-      const elapsedTime = Math.floor(
-        (Date.now() - parseInt(startTime!, 10)) / 1000
-      );
-      const newTimeLeft = duration - elapsedTime;
+      const newTimeLeft = calculateTimeLeft(startTime, duration);
 
       if (newTimeLeft <= 0) {
         clearInterval(interval);
         onTimeUp();
         setTimeLeft(0);
-        localStorage.removeItem(startTimeKey);
       } else {
         setTimeLeft(newTimeLeft);
       }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [duration, onTimeUp, uniqueKey]);
+  }, [duration, onTimeUp, startTime]);
+
+  const formattedTime = `${String(Math.floor(timeLeft / 60)).padStart(
+    2,
+    '0'
+  )}:${String(timeLeft % 60).padStart(2, '0')}`;
 
   return (
     <Box

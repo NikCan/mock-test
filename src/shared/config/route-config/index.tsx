@@ -1,16 +1,18 @@
-import { HomePage, TestPage } from '@/pages';
+import { HomePage, NotFoundPage, TestPage } from '@/pages';
 import { RouteProps } from 'react-router-dom';
 
 export enum AppRoutes {
   MAIN = 'main',
   HOME = 'home',
-  TEST = 'test'
+  TEST = 'test',
+  NOT_FOUND = 'notFound'
 }
 
 export const RoutePath: Record<AppRoutes, string> = {
   [AppRoutes.MAIN]: '/',
-  [AppRoutes.HOME]: '/home',
-  [AppRoutes.TEST]: '/' // + :id
+  [AppRoutes.HOME]: '/',
+  [AppRoutes.TEST]: '/test/', // + :id
+  [AppRoutes.NOT_FOUND]: '*'
 };
 
 export const routeConfig: Record<AppRoutes, RouteProps> = {
@@ -25,5 +27,9 @@ export const routeConfig: Record<AppRoutes, RouteProps> = {
   [AppRoutes.TEST]: {
     path: `${RoutePath.test}:id`,
     element: <TestPage />
+  },
+  [AppRoutes.NOT_FOUND]: {
+    path: RoutePath.notFound,
+    element: <NotFoundPage />
   }
 };

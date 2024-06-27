@@ -41,6 +41,6 @@ export type Question =
 export interface Test {
   id: number;
   title: string;
-  timeLimit: number; // in seconds
+  timeLimit?: number; // in seconds
   questions: Question[];
 }

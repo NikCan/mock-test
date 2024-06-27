@@ -8,6 +8,16 @@ interface Props {
 }
 
 export const TestStepper: FC<Props> = memo(({ total, current }) => {
+  const items = useMemo(() => {
+    return new Array(total).fill(0).map((_, i) => {
+      const style: CSSProperties = {
+        backgroundColor: i < current ? 'black' : i === current ? 'red' : 'gray',
+        opacity: i < current ? 1 : 0.5
+      };
+      return <StepperItem key={i} style={style} />;
+    });
+  }, [total, current]);
+
   return (
     <Stack
       sx={{
@@ -18,18 +28,7 @@ export const TestStepper: FC<Props> = memo(({ total, current }) => {
         minHeight: '8px'
       }}
     >
-      {new Array(total).fill(0).map((_, i) => {
-        const style: CSSProperties = useMemo(() => {
-          if (i < current) {
-            return { backgroundColor: 'black' };
-          } else if (i === current) {
-            return { backgroundColor: 'red' };
-          }
-          return { backgroundColor: 'gray', opacity: 0.5 };
-        }, [current]);
-
-        return <StepperItem key={i} style={style} />;
-      })}
+      {items}
     </Stack>
   );
 });

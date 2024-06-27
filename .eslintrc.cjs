@@ -7,6 +7,7 @@ module.exports = {
     'plugin:react-hooks/recommended',
     'plugin:react/recommended',
     'plugin:react/jsx-runtime',
+    'plugin:prettier/recommended',
     "prettier",
   ],
   ignorePatterns: ['dist', '.eslintrc.cjs'],
@@ -14,10 +15,15 @@ module.exports = {
     parserOptions: {
     ecmaVersion: "latest",
     sourceType: "module",
-    project: ["./tsconfig.json", "./tsconfig.node.json"],
+    project: ["./tsconfig.json", "./tsconfig.node.json", "./tsconfig.app.json"],
     tsconfigRootDir: __dirname,
   },
   plugins: ['react-refresh', "prettier"],
+  settings: {
+    react: {
+      version: 'detect'
+    },
+  },
   rules: {
     'react-refresh/only-export-components': [
       'warn',

@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { immer } from 'zustand/middleware/immer';
 import { AppActions, AppState } from '../types';
 
 const initialState: AppState = {
@@ -9,7 +8,7 @@ const initialState: AppState = {
 
 export const useAppStore = create<AppState & AppActions>()(
   persist(
-    immer((set) => ({
+    (set) => ({
       ...initialState,
       setCurrentQuestionIndex: (testId, index) =>
         set((state) => ({
@@ -18,7 +17,7 @@ export const useAppStore = create<AppState & AppActions>()(
             [testId]: index
           }
         }))
-    })),
+    }),
     { name: 'app-storage' }
   )
 );

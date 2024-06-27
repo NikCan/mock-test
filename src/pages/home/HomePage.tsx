@@ -1,31 +1,25 @@
 import { OpenTestButton } from '@/features';
-import { mockTests } from '@/shared/mockData';
+import { mockTests } from '@/shared/mock-data';
 import { Stack, Typography } from '@mui/material';
 import { FC, memo, useMemo } from 'react';
 
 export const HomePage: FC = memo(() => {
-  const tests = useMemo(() => {
+  const testButtons = useMemo(() => {
     return mockTests.map((test) => {
       return (
-        <OpenTestButton testId={test.id} key={test.id}>
-          {test.title}
+        <OpenTestButton key={test.id} testId={test.id}>
+          <Typography noWrap textOverflow={'ellipsis'}>
+            {test.title}
+          </Typography>
         </OpenTestButton>
       );
     });
-  }, [mockTests]);
+  }, []);
+
   return (
-    <Stack sx={{ alignItems: 'center', gap: 2 }}>
+    <Stack sx={{ gap: 3, alignItems: 'flex-start' }}>
       <Typography variant="h5">Select the test you need:</Typography>
-      <Stack
-        sx={{
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-          gap: 1,
-          justifyContent: 'center'
-        }}
-      >
-        {tests}
-      </Stack>
+      <Stack sx={{ gap: 2 }}>{testButtons}</Stack>
     </Stack>
   );
 });

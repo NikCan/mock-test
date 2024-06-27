@@ -1,3 +1,4 @@
+import { RoutePath } from '@/shared/config';
 import { Button } from '@mui/material';
 import { FC, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -10,10 +11,10 @@ export const OpenTestButton: FC<Props> = memo(({ children, testId }) => {
   const navigate = useNavigate();
 
   const onOpenTest = () => {
-    navigate(`/${testId}`);
+    navigate(`${RoutePath.test}${testId}`);
   };
   return (
-    <Button variant="contained" onClick={onOpenTest}>
+    <Button size="large" variant="contained" onClick={onOpenTest}>
       {children}
     </Button>
   );
